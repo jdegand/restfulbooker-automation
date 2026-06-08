@@ -13,6 +13,17 @@ public class BookingClient {
     @Value("${restfulbooker.base-url}")
     private String baseUrl;
 
+    public Response createToken(Object requestBody) {
+        return RestAssured.given()
+                .baseUri(baseUrl)
+                .contentType("application/json")
+                .body(requestBody)
+                .post("/auth")
+                .then()
+                .extract()
+                .response();
+    }
+
     public Response createBooking(Object requestBody) {
         return RestAssured.given()
                 .baseUri(baseUrl)
