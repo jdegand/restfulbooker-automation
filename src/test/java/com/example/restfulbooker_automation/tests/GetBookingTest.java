@@ -10,7 +10,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.example.restfulbooker_automation.client.BookingClient;
 import com.example.restfulbooker_automation.factory.BookingFactory;
 import com.example.restfulbooker_automation.models.BookingRequest;
-
 import io.restassured.response.Response;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,35 +17,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {BookingClient.class})
 @TestPropertySource(locations = "classpath:application.properties")
-class CreateBookingTest {
+class GetBookingTest {
 
     @Autowired
     private BookingClient bookingClient;
 
     @Test
-    void shouldCreateBookingSuccessfully() {
+    void shouldGetBookingSuccessfully() {
         // Arrange
         BookingRequest request = BookingFactory.createValidBooking();
+        Response createResponse = bookingClient.createBooking(request);
+        int bookingId = createResponse.jsonPath().getInt("bookingid");
 
         // Act
-        Response response = bookingClient.createBooking(request);
+        Response response = bookingClient.getBooking(bookingId);
 
         // Assert
         assertThat(response.statusCode()).isEqualTo(200);
-
-        int bookingId = response.jsonPath().getInt("bookingid");
-        assertThat(bookingId).isGreaterThan(0);
-
-        assertThat(response.jsonPath().getString("booking.firstname"))
+        assertThat(response.jsonPath().getString("firstname"))
                 .isEqualTo(request.getFirstname());
-
-        assertThat(response.jsonPath().getString("booking.lastname"))
+        assertThat(response.jsonPath().getString("lastname"))
                 .isEqualTo(request.getLastname());
-
-        assertThat(response.jsonPath().getInt("booking.totalprice"))
+        assertThat(response.jsonPath().getInt("totalprice"))
                 .isEqualTo(request.getTotalprice());
-
-        assertThat(response.jsonPath().getBoolean("booking.depositpaid"))
+        assertThat(response.jsonPath().getBoolean("depositpaid"))
                 .isEqualTo(request.isDepositpaid());
     }
 }
